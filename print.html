@@ -182,20 +182,25 @@ documentation or the code! Thank you!</p>
 <li><a href="getting-started/quick-start.html">Quick Start</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="-installation"><a class="header" href="#-installation">🌞 Installation</a></h2>
-<p>Packages marked with 🔸 are maintained by community members (i.e. not the cargo-msrv authors)</p>
+<p>Packages marked with 🔸 are maintained by community members (i.e. not the cargo-msrv authors). A big thank you to them!</p>
 <h3 id="using-a-hrefhttpsdocrust-langorgcargocommandscargo-installhtmlcargoa"><a class="header" href="#using-a-hrefhttpsdocrust-langorgcargocommandscargo-installhtmlcargoa">Using <a href="https://doc.rust-lang.org/cargo/commands/cargo-install.html">Cargo</a>:</a></h3>
 <p>You can install cargo-msrv from source by using Cargo, the Rust package manager and build tool (<a href="https://crates.io/crates/cargo-msrv">package</a>).</p>
 <p><strong>How to install the latest stable release?</strong></p>
 <pre><code class="language-shell">cargo install cargo-msrv
 </code></pre>
+<p><strong>How to install the latest stable release more quickly?</strong></p>
+<p>Similar to the above, but allows for only the default channel to obtain a list of rustc releases.
+This compiles about 40% faster and produces binaries about half the size in the range of 4.5MB.</p>
+<pre><code class="language-shell">cargo install cargo-msrv --no-default-features
+</code></pre>
 <p><strong>How to install the latest development release?</strong></p>
 <p>You may install <em>cargo-msrv</em> from GitHub:</p>
 <pre><code class="language-shell">cargo install cargo-msrv --git https://github.com/foresterre/cargo-msrv.git --branch main
 </code></pre>
-<h3 id="aur-arch-linux-"><a class="header" href="#aur-arch-linux-">AUR (Arch Linux) 🔸</a></h3>
-<p>cargo-msrv is available from the Arch Linux user repository (<a href="https://aur.archlinux.org/packages/cargo-msrv/">AUR</a>).</p>
+<h3 id="arch-linux-"><a class="header" href="#arch-linux-">Arch Linux 🔸</a></h3>
+<p>cargo-msrv is available from the Arch Linux <a href="https://archlinux.org/packages/community/x86_64/cargo-msrv/">community repository</a>.</p>
 <p><strong>How to install?</strong></p>
-<pre><code class="language-shell">paru -S cargo-msrv
+<pre><code class="language-shell">pacman -S cargo-msrv
 </code></pre>
 <h3 id="nix-"><a class="header" href="#nix-">Nix 🔸</a></h3>
 <p>cargo-msrv is available from the Nix package manager and in NixOS (<a href="https://search.nixos.org/packages?channel=21.05&amp;show=cargo-msrv&amp;from=0&amp;size=50&amp;sort=relevance&amp;type=packages&amp;query=cargo-msrv">package</a>):</p>
@@ -247,6 +252,7 @@ acceptable Rust releases. If you require additional options, please refer to the
 <li><a href="commands/./find.html">cargo-msrv</a> (<code>find</code>): The top level command is used to find the MSRV for your crate.</li>
 <li><a href="commands/./help.html">cargo-msrv help</a>: The <code>help</code> subcommand is used to learn more about the usage and the knobs and handles of the application.</li>
 <li><a href="commands/./list.html">cargo-msrv list</a>: The <code>list</code> subcommand is used to list the known MSRV's of the dependencies of your crate.</li>
+<li><a href="commands/./set.html">cargo-msrv set</a>: The <code>set</code> subcommand is used to quickly set the MSRV of a crate.</li>
 <li><a href="commands/./show.html">cargo-msrv show</a>: The <code>show</code> subcommand is used to quickly show the MSRV of a crate.</li>
 <li><a href="commands/./verify.html">cargo-msrv verify</a>: The <code>verify</code> subcommand is used to check whether the pinned MSRV is acceptable. </li>
 </ul>
@@ -309,11 +315,10 @@ Possible values are: <code>error</code>, <code>warn</code>, <code>info</code> (d
 Lower severities include messages of higher severities.
 When <code>--no-log</code> is present, this option will be ignored.</p>
 <p><strong><code>--log-target</code> log_target</strong></p>
-<p>Specify where cargo-msrv should output its debug logs.
+<p>Specify where cargo-msrv should output its internal debug logs.
 Possible values are <code>file</code> (default) and <code>stdout</code>.
-The log output of <code>stdout</code> may interfere with user output. We would suggest to use <code>--output-format void</code> in tandem
-with <code>--log-target stdout</code>.
-When <code>--no-log</code> is present, this option will be ignored.</p>
+The log output of <code>stdout</code> may interfere with user output. We would suggest to use <code>--no-user-output</code> in tandem
+with <code>--log-target stdout</code>. When <code>--no-log</code> is present, this option will be ignored.</p>
 <p><strong><code>--max</code> version</strong></p>
 <p>Latest (most recent) version to take into account. The version must match a valid three component Rust toolchain version, 
 and be semver compatible. An example of an acceptable versions is &quot;1.35.0&quot;, while &quot;1.35&quot;, &quot;^1.35.0&quot; and &quot;1.35.0-beta&quot; are not valid.</p>
@@ -321,20 +326,25 @@ and be semver compatible. An example of an acceptable versions is &quot;1.35.0&q
 <p>Earliest (least recent) version to take into account. The version must match a valid three component Rust toolchain version,
 and be semver compatible. Edition aliases may also be used. An example of an acceptable versions is &quot;1.35.0&quot;, while
 &quot;1.35&quot;, &quot;^1.35.0&quot; and &quot;1.35.0-beta&quot; are not valid. Editions map to the first version in which they were introduced, so
-for example &quot;1.56.0&quot; for edition &quot;2018&quot;.</p>
+for example &quot;1.56.0&quot; for edition &quot;2021&quot;.</p>
 <p><strong><code>--no-check-feedback</code></strong></p>
 <p>If provided, the outcome of individual checks will not be printed. These prints provide feedback, about the order in which
 checks ran, and their results. This is especially useful if you want to know why a certain Rust version was deemed to be
 incompatible, for example, so you can identify Rust features which require a certain minimum Rust version.</p>
 <p><strong><code>--no-log</code></strong></p>
-<p>Do not write debug log output to the log target.</p>
+<p>Do not write (internal) debug log output to the log target.</p>
 <p><strong><code>--no-read-min-edition</code></strong></p>
 <p>If provided, the 'package.edition' value in the Cargo.toml will not be used to reduce search space.
 By default, the edition is read from the <code>Cargo.toml</code> file and used as the minimum Rust version. See also <code>--min</code>.</p>
+<p><strong><code>--no-user-output</code></strong></p>
+<p>Disables printing of diagnostic status messages. Useful when internal log output messages are printed to the stdout,
+using <code>--log-target stdout</code>, so no clipping between the user output prints and log message prints will take place.
+When present, the <code>--output-format [value]</code> option will be ignored.</p>
 <p><strong><code>--output-format</code> format</strong></p>
-<p>Output status messages in machine-readable format. Machine-readable status updates will be printed in the requested format to stdout.
-Accepted formats are &quot;json&quot; and &quot;void&quot;. In case of &quot;json&quot;, JSON output will be written; and in case of &quot;void&quot;, no output
-will be written. If this option is absent, a human-readable output format will be shown.</p>
+<p>Output diagnostic status messages in machine-readable format. Machine-readable status updates will be printed in the
+requested format to stdout. The only accepted format is currently &quot;json&quot;, which will print diagnostic messages in a JSON
+format. When this option is absent, human-readable output will be printed. Diagnostic messages can be disabled entirely
+using the <code>--no-user-output</code> flag.</p>
 <p><strong><code>--release-source</code> source</strong></p>
 <p>Select the rust-releases source to use as the release index. Available options are <code>rust-changelog</code> and <code>rust-dist</code>.
 The first will parse the Rust changelog file to determine which Rust releases have been made, while the second will index
